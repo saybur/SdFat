@@ -39,4 +39,21 @@ __attribute__((weak)) void sdCsWrite(SdCsPin_t pin, bool level) {
   digitalWrite(pin, level ? HIGH : LOW);
 }
 #endif  // SD_CHIP_SELECT_MODE == 0
+#elif defined(ARDUINO_ARCH_RP2040)
+#include "hardware/gpio.h"
+#if SD_CHIP_SELECT_MODE == 0
+//------------------------------------------------------------------------------
+void sdCsInit(SdCsPin_t pin) { gpio_set_dir(pin, 1); }
+//------------------------------------------------------------------------------
+void sdCsWrite(SdCsPin_t pin, bool level) {
+  gpio_put(pin, level ? 1 : 0);
+}
+#elif SD_CHIP_SELECT_MODE == 1
+//------------------------------------------------------------------------------
+__attribute__((weak)) void sdCsInit(SdCsPin_t pin) { gpio_set_dir(pin, 1); }
+//------------------------------------------------------------------------------
+__attribute__((weak)) void sdCsWrite(SdCsPin_t pin, bool level) {
+  gpio_put(pin, level ? 1 : 0);
+}
+#endif  // defined(ARDUINO_ARCH_RP2040)
 #endif  // ENABLE_ARDUINO_FEATURES
